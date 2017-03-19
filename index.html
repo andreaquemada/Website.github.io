@@ -1,6 +1,100 @@
+<!DOCTYPE html>
 <html>
+<head>
+	<meta charset="utf-8">
+	<title>D3TEST_CHAPTERS6TO8</title>
+	<script type="text/javascript" src="d3/d3.js"></script>
+	<link rel="stylesheet" href="sty.css">
+</head>
 <body>
-<a href="ex514.html">Exercise 1</a>
-<a href="ex322.html">Exercise 2</a>
+
+	<p> CLICK ME to update the chart with new values</p>
+	<script type="text/javascript">
+		
+		var w=600,h=300;
+		var dataset=[ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+							11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
+		var padding=1;
+
+
+	// Create scales
+	var xscale=d3.scale.ordinal()
+				.domain(d3.range(dataset.length))
+				.rangeRoundBands([0,w],0.05);
+	var yscale=d3.scale.linear()
+				.domain([0,d3.max(dataset)])
+				.range([0,h]);
+
+		var svg=d3.select("body").append("svg").attr("width",w).attr("height",h);
+		var rectangles=svg.selectAll("rect").data(dataset).enter().append("rect");
+		rectangles.attr("x",function(d,i)
+		{
+			return xscale(i);
+		})
+		.attr("y",function(d)
+		{
+			return (h-yscale(d));
+		})
+		.attr("width",xscale.rangeBand())
+		.attr("height",function(d)
+		{
+			return yscale(d);
+		})
+		.attr("fill",function(d)
+		{
+			return "rgb(0,"+(d*10)+",0)";
+		});
+
+		var texts=svg.selectAll("text").data(dataset).enter().append("text");
+		texts.text(function(d){return d})
+				.attr(
+				{
+					"text-anchor":"middle",
+					x:function(d,i){return xscale(i) + xscale.rangeBand()/2;},
+					y:function(d){return h-yscale(d)+ 14;},
+					"font-family": "sans-serif",
+					"font-size":"11px",
+					"fill":"white"
+				});
+
+		d3.select("p")
+			.on("click",function(){
+
+				//New values for dataset
+				//var dataset=[11, 12, 15, 20, 18, 17, 16, 18, 23, 25, 5, 10, 13, 19, 21, 25, 22, 18, 15, 13];
+
+				var dataset=[];
+				var numDataPoints=20;
+			
+				for(var i=0;i<numDataPoints;i++)
+				{
+					var newNumber1=Math.floor(Math.random()*30);
+					dataset.push(newNumber1);
+				}
+
+				//Update rectangles
+				rectangles.data(dataset)
+							.transition()
+							.duration(1500)
+							.attr(
+							{
+								y:function(d){return h-yscale(d);},
+								height:function(d){	return yscale(d);},
+								fill:function(d){return "rgb(0,"+d*10+",0)";}
+								
+							});
+
+				//Update all labels
+				texts.data(dataset)
+					.text(function(d){return d;})
+					.attr({
+						x:function(d,i){return xscale(i)+xscale.rangeBand()/2;},
+						y:function(d){return h-yscale(d)+14}
+					});
+			});
+	</script>
+
+
+
 </body>
 </html>
